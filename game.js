@@ -47,8 +47,80 @@ function stickBallToPaddle() {
   ball.y = paddle.y - ball.r;
 }
 
+const keys = { left: false, right: false };
+
+function setKey(e, down) {
+  switch (e.code) {
+    case "ArrowLeft":
+    case "KeyA":
+      keys.left = down;
+      e.preventDefault();
+      break;
+    case "ArrowRight":
+    case "KeyD":
+      keys.right = down;
+      e.preventDefault();
+      break;
+  }
+}
+
+window.addEventListener("keydown", (e) => setKey(e, true));
+window.addEventListener("keyup", (e) => setKey(e, false));
+
+function clampPaddle() {
+  const { paddle } = state;
+  paddle.x = Math.max(0, Math.min(CANVAS_W - paddle.w, paddle.x));
+}
+
+canvas.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = ((e.clientX - rect.left) / rect.width) * CANVAS_W;
+  state.paddle.x = mouseX - state.paddle.w / 2;
+  clampPaddle();
+});
+
+function launch() {
+  if (state.phase !== "ready") return;
+  const { ball } = state;
+  ball.vx = 0;
+  ball.vy = -ball.speed;
+  state.phase = "playing";
+}
+
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    if (!e.repeat) launch();
+  }
+});
+canvas.addEventListener("mousedown", launch);
+
+function moveBall(dt) {
+  const { ball } = state;
+  ball.x += ball.vx * dt;
+  ball.y += ball.vy * dt;
+
+  if (ball.x - ball.r < 0) {
+    ball.x = ball.r;
+    ball.vx = Math.abs(ball.vx);
+  } else if (ball.x + ball.r > CANVAS_W) {
+    ball.x = CANVAS_W - ball.r;
+    ball.vx = -Math.abs(ball.vx);
+  }
+  if (ball.y - ball.r < 0) {
+    ball.y = ball.r;
+    ball.vy = Math.abs(ball.vy);
+  }
+}
+
 function update(dt) {
+  const { paddle } = state;
+  const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+  paddle.x += dir * paddle.speed * dt;
+  clampPaddle();
+
   if (state.phase === "ready") stickBallToPaddle();
+  else if (state.phase === "playing") moveBall(dt);
 }
 
 function render() {

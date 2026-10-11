@@ -87,11 +87,23 @@ function launch() {
   state.phase = "playing";
 }
 
+function restart() {
+  state.lives = 3;
+  state.blocks = buildBlocks();
+  state.explosions = [];
+  state.ball.vx = 0;
+  state.ball.vy = 0;
+  state.phase = "ready";
+  stickBallToPaddle();
+}
+
 window.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
-    e.preventDefault();
-    if (!e.repeat) launch();
-  }
+  if (e.code !== "Space" && e.code !== "Enter") return;
+  e.preventDefault();
+  if (e.repeat) return;
+  // Single handler so the restarting keypress can't also launch the ball
+  if (state.phase === "won" || state.phase === "lost") restart();
+  else if (e.code === "Space") launch();
 });
 canvas.addEventListener("mousedown", launch);
 

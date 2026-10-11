@@ -95,6 +95,21 @@ window.addEventListener("keydown", (e) => {
 });
 canvas.addEventListener("mousedown", launch);
 
+const sounds = {
+  bounce: new Audio("assets/sounds/ball-bounce.mp3"),
+  break: new Audio("assets/sounds/break-sound.mp3"),
+};
+
+function playSound(sound) {
+  try {
+    sound.currentTime = 0;
+    const p = sound.play();
+    if (p && p.catch) p.catch(() => {});
+  } catch (_) {
+    // audio unavailable or blocked: the game keeps running
+  }
+}
+
 function moveBall(dt) {
   const { ball } = state;
   ball.x += ball.vx * dt;
@@ -103,13 +118,16 @@ function moveBall(dt) {
   if (ball.x - ball.r < 0) {
     ball.x = ball.r;
     ball.vx = Math.abs(ball.vx);
+    playSound(sounds.bounce);
   } else if (ball.x + ball.r > CANVAS_W) {
     ball.x = CANVAS_W - ball.r;
     ball.vx = -Math.abs(ball.vx);
+    playSound(sounds.bounce);
   }
   if (ball.y - ball.r < 0) {
     ball.y = ball.r;
     ball.vy = Math.abs(ball.vy);
+    playSound(sounds.bounce);
   }
 }
 
@@ -142,6 +160,7 @@ function collidePaddle() {
   ball.vy = -Math.cos(angle) * ball.speed;
   renormalizeBall();
   ball.y = paddle.y - ball.r;
+  playSound(sounds.bounce);
 }
 
 function collideBlocks() {
@@ -190,6 +209,9 @@ function collideBlocks() {
       color: hit.color,
       startedAt: performance.now(),
     });
+    playSound(sounds.break);
+  } else {
+    playSound(sounds.bounce);
   }
 }
 

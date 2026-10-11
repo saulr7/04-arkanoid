@@ -144,6 +144,45 @@ function collidePaddle() {
   ball.y = paddle.y - ball.r;
 }
 
+function collideBlocks() {
+  const { ball, blocks } = state;
+
+  // Nearest overlapping alive block (by center distance)
+  let hit = null;
+  let hitDist = Infinity;
+  let hitOverlapX = 0;
+  let hitOverlapY = 0;
+  for (const b of blocks) {
+    if (!b.alive) continue;
+    const overlapX = Math.min(ball.x + ball.r, b.x + b.w) - Math.max(ball.x - ball.r, b.x);
+    const overlapY = Math.min(ball.y + ball.r, b.y + b.h) - Math.max(ball.y - ball.r, b.y);
+    if (overlapX <= 0 || overlapY <= 0) continue;
+    const dist = Math.hypot(ball.x - (b.x + b.w / 2), ball.y - (b.y + b.h / 2));
+    if (dist < hitDist) {
+      hit = b;
+      hitDist = dist;
+      hitOverlapX = overlapX;
+      hitOverlapY = overlapY;
+    }
+  }
+  if (!hit) return;
+
+  // Bounce on one axis only: the one with the smaller penetration
+  if (hitOverlapX < hitOverlapY) {
+    const fromLeft = ball.x < hit.x + hit.w / 2;
+    ball.x += fromLeft ? -hitOverlapX : hitOverlapX;
+    ball.vx = fromLeft ? -Math.abs(ball.vx) : Math.abs(ball.vx);
+  } else {
+    const fromTop = ball.y < hit.y + hit.h / 2;
+    ball.y += fromTop ? -hitOverlapY : hitOverlapY;
+    ball.vy = fromTop ? -Math.abs(ball.vy) : Math.abs(ball.vy);
+  }
+  renormalizeBall();
+
+  hit.hp -= 1;
+  if (hit.hp <= 0) hit.alive = false;
+}
+
 function update(dt) {
   const { paddle } = state;
   const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
@@ -155,6 +194,7 @@ function update(dt) {
   } else if (state.phase === "playing") {
     moveBall(dt);
     collidePaddle();
+    collideBlocks();
   }
 }
 

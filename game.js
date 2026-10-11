@@ -215,6 +215,39 @@ function collideBlocks() {
   }
 }
 
+function checkEndConditions() {
+  const { ball } = state;
+
+  if (ball.y - ball.r > CANVAS_H) {
+    state.lives -= 1;
+    ball.vx = 0;
+    ball.vy = 0;
+    if (state.lives <= 0) {
+      state.lives = 0;
+      state.phase = "lost";
+    } else {
+      state.phase = "ready";
+      stickBallToPaddle();
+    }
+    return;
+  }
+
+  if (!state.blocks.some((b) => b.alive)) {
+    state.phase = "won";
+  }
+}
+
+function drawOverlay(title, subtitle) {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "bold 56px sans-serif";
+  ctx.fillText(title, CANVAS_W / 2, CANVAS_H / 2);
+  ctx.font = "20px sans-serif";
+  ctx.fillText(subtitle, CANVAS_W / 2, CANVAS_H / 2 + 40);
+}
+
 function update(dt) {
   const { paddle } = state;
   const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
@@ -227,6 +260,7 @@ function update(dt) {
     moveBall(dt);
     collidePaddle();
     collideBlocks();
+    checkEndConditions();
   }
 }
 
@@ -251,6 +285,14 @@ function render() {
   const { paddle, ball } = state;
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
   drawSprite(ctx, "ball", ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
+
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "left";
+  ctx.font = "20px sans-serif";
+  ctx.fillText(`Lives: ${state.lives}`, 16, 30);
+
+  if (state.phase === "won") drawOverlay("You win", "Press Space or Enter to restart");
+  else if (state.phase === "lost") drawOverlay("Game over", "Press Space or Enter to restart");
 }
 
 let lastTime = 0;

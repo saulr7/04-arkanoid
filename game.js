@@ -180,7 +180,17 @@ function collideBlocks() {
   renormalizeBall();
 
   hit.hp -= 1;
-  if (hit.hp <= 0) hit.alive = false;
+  if (hit.hp <= 0) {
+    hit.alive = false;
+    state.explosions.push({
+      x: hit.x,
+      y: hit.y,
+      w: hit.w,
+      h: hit.h,
+      color: hit.color,
+      startedAt: performance.now(),
+    });
+  }
 }
 
 function update(dt) {
@@ -203,6 +213,17 @@ function render() {
 
   for (const b of state.blocks) {
     if (b.alive) drawSprite(ctx, "block_" + b.color, b.x, b.y, b.w, b.h);
+  }
+
+  const now = performance.now();
+  state.explosions = state.explosions.filter((ex) => now - ex.startedAt < EXPLOSION_DURATION);
+  for (const ex of state.explosions) {
+    const frameCount = EXPLOSION_FRAMES[ex.color].length;
+    const index = Math.min(
+      frameCount - 1,
+      Math.floor((now - ex.startedAt) / (EXPLOSION_DURATION / frameCount))
+    );
+    drawFrame(ctx, EXPLOSION_FRAMES[ex.color][index], ex.x, ex.y, ex.w, ex.h);
   }
 
   const { paddle, ball } = state;

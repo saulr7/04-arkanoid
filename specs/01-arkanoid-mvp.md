@@ -1,6 +1,6 @@
 # SPEC 01 — Arkanoid MVP
 
-> **Status:** Draft
+> **Status:** approved
 > **Depends on:** None
 > **Date:** 2026-10-10
 > **Objective:** A playable single-level Arkanoid in the browser where the player controls a paddle, bounces a ball to break all blocks, and has 3 lives.
@@ -41,12 +41,12 @@ const CANVAS_W = 800;
 const CANVAS_H = 600;
 
 const state = {
-  phase: 'ready',   // 'ready' (ball stuck to paddle) | 'playing' | 'won' | 'lost'
+  phase: "ready", // 'ready' (ball stuck to paddle) | 'playing' | 'won' | 'lost'
   lives: 3,
   paddle: { x: 340, y: 560, w: 120, h: 14, speed: 600 },
-  ball:   { x: 0, y: 0, r: 8, vx: 0, vy: 0, speed: 420 },
-  blocks: [],       // see Block below
-  explosions: [],   // see Explosion below
+  ball: { x: 0, y: 0, r: 8, vx: 0, vy: 0, speed: 420 },
+  blocks: [], // see Block below
+  explosions: [], // see Explosion below
 };
 
 // One entry per grid cell, built by buildBlocks()
@@ -114,13 +114,13 @@ Conventions:
 
 ## Risks
 
-| Risk                                                         | Mitigation                                                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Ball tunnels through blocks or paddle at low frame rates     | Cap delta time at 50 ms; at 420 px/s the ball moves at most 21 px per frame, less than a block height. |
-| Corner hits resolve on the wrong axis                        | Resolve using the smaller penetration overlap and only bounce on one axis per frame.        |
+| Risk                                                               | Mitigation                                                                                                                                                                                         |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ball tunnels through blocks or paddle at low frame rates           | Cap delta time at 50 ms; at 420 px/s the ball moves at most 21 px per frame, less than a block height.                                                                                             |
+| Corner hits resolve on the wrong axis                              | Resolve using the smaller penetration overlap and only bounce on one axis per frame.                                                                                                               |
 | `spritesheet-breakout.png` fails to load when opened via `file://` | Draw helpers are no-ops until loaded; the game starts only after `loadSpritesheet` callback. If canvas reads are blocked on `file://`, serve with a static server (e.g. `python3 -m http.server`). |
-| Browser blocks audio before user interaction                 | Sounds are first played after launch (a user gesture); `play()` rejections are caught.      |
-| Sounds overlap and cut each other off on rapid hits          | Reset `currentTime` to 0 before each play; acceptable for the MVP.                          |
+| Browser blocks audio before user interaction                       | Sounds are first played after launch (a user gesture); `play()` rejections are caught.                                                                                                             |
+| Sounds overlap and cut each other off on rapid hits                | Reset `currentTime` to 0 before each play; acceptable for the MVP.                                                                                                                                 |
 
 ## What is **not** in this spec
 

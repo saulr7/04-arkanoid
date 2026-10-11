@@ -113,14 +113,49 @@ function moveBall(dt) {
   }
 }
 
+const MAX_BOUNCE_ANGLE = (60 * Math.PI) / 180;
+
+function renormalizeBall() {
+  const { ball } = state;
+  const len = Math.hypot(ball.vx, ball.vy);
+  if (len === 0) return;
+  ball.vx = (ball.vx / len) * ball.speed;
+  ball.vy = (ball.vy / len) * ball.speed;
+}
+
+function collidePaddle() {
+  const { ball, paddle } = state;
+  if (ball.vy <= 0) return;
+  const hit =
+    ball.x + ball.r > paddle.x &&
+    ball.x - ball.r < paddle.x + paddle.w &&
+    ball.y + ball.r > paddle.y &&
+    ball.y - ball.r < paddle.y + paddle.h;
+  if (!hit) return;
+
+  const offset = Math.max(
+    -1,
+    Math.min(1, (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2))
+  );
+  const angle = offset * MAX_BOUNCE_ANGLE; // from vertical
+  ball.vx = Math.sin(angle) * ball.speed;
+  ball.vy = -Math.cos(angle) * ball.speed;
+  renormalizeBall();
+  ball.y = paddle.y - ball.r;
+}
+
 function update(dt) {
   const { paddle } = state;
   const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
   paddle.x += dir * paddle.speed * dt;
   clampPaddle();
 
-  if (state.phase === "ready") stickBallToPaddle();
-  else if (state.phase === "playing") moveBall(dt);
+  if (state.phase === "ready") {
+    stickBallToPaddle();
+  } else if (state.phase === "playing") {
+    moveBall(dt);
+    collidePaddle();
+  }
 }
 
 function render() {

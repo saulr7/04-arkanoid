@@ -10,6 +10,27 @@ const GRID_Y = 60;
 const ROW_COLORS = ["gray", "red", "yellow", "cyan", "magenta", "hotpink", "green"];
 const MAX_DT = 0.05; // seconds
 
+const PARTICLES_PER_BLOCK = 8;
+const PARTICLES_PER_GRAY_HIT = 3;
+const MAX_PARTICLES = 200;
+const PARTICLE_LIFE = 500; // ms
+const PARTICLE_GRAVITY = 600; // px/s^2
+const PARTICLE_SPEED_MIN = 80; // px/s
+const PARTICLE_SPEED_MAX = 260; // px/s
+const PARTICLE_SIZE_MIN = 3; // px
+const PARTICLE_SIZE_MAX = 5; // px
+const FLASH_DURATION = 80; // ms
+
+const PARTICLE_COLORS = {
+  gray: "#b0b0b0",
+  red: "#e53935",
+  yellow: "#fdd835",
+  cyan: "#00e5ff",
+  magenta: "#d500f9",
+  hotpink: "#ff4081",
+  green: "#43a047",
+};
+
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -20,6 +41,7 @@ const state = {
   ball: { x: 0, y: 0, r: 8, vx: 0, vy: 0, speed: 420 },
   blocks: [],
   explosions: [],
+  particles: [], // { x, y, vx, vy, size, color, startedAt }
 };
 
 function buildBlocks() {
@@ -91,6 +113,7 @@ function restart() {
   state.lives = 3;
   state.blocks = buildBlocks();
   state.explosions = [];
+  state.particles = [];
   state.ball.vx = 0;
   state.ball.vy = 0;
   state.phase = "ready";

@@ -198,6 +198,29 @@ function collidePaddle() {
   playSound(sounds.bounce);
 }
 
+function spawnParticles(block, count) {
+  const now = performance.now();
+  const cx = block.x + block.w / 2;
+  const cy = block.y + block.h / 2;
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = PARTICLE_SPEED_MIN + Math.random() * (PARTICLE_SPEED_MAX - PARTICLE_SPEED_MIN);
+    state.particles.push({
+      x: cx,
+      y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: PARTICLE_SIZE_MIN + Math.random() * (PARTICLE_SIZE_MAX - PARTICLE_SIZE_MIN),
+      color: PARTICLE_COLORS[block.color],
+      startedAt: now,
+    });
+  }
+  // Drop the oldest particles first when over the cap
+  if (state.particles.length > MAX_PARTICLES) {
+    state.particles.splice(0, state.particles.length - MAX_PARTICLES);
+  }
+}
+
 function collideBlocks() {
   const { ball, blocks } = state;
 
@@ -283,6 +306,26 @@ function drawOverlay(title, subtitle) {
   ctx.fillText(subtitle, CANVAS_W / 2, CANVAS_H / 2 + 40);
 }
 
+function updateParticles(dt) {
+  const now = performance.now();
+  state.particles = state.particles.filter((p) => now - p.startedAt < PARTICLE_LIFE);
+  for (const p of state.particles) {
+    p.vy += PARTICLE_GRAVITY * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+}
+
+function drawParticles(now) {
+  for (const p of state.particles) {
+    const alpha = Math.min(1, Math.max(0, 1 - (now - p.startedAt) / PARTICLE_LIFE));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
+}
+
 function update(dt) {
   const { paddle } = state;
   const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
@@ -297,6 +340,8 @@ function update(dt) {
     collideBlocks();
     checkEndConditions();
   }
+
+  updateParticles(dt);
 }
 
 function render() {
@@ -316,6 +361,8 @@ function render() {
     );
     drawFrame(ctx, EXPLOSION_FRAMES[ex.color][index], ex.x, ex.y, ex.w, ex.h);
   }
+
+  drawParticles(now);
 
   const { paddle, ball } = state;
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);

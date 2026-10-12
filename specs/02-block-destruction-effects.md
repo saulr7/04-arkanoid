@@ -1,6 +1,6 @@
 # SPEC 02 — Block destruction effects
 
-> **Status:** approved
+> **Status:** implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-10-11
 > **Objective:** Add debris particles to block destruction, and a white flash plus a few particles to the first hit on gray blocks, on top of the existing 4-frame sprite explosion.
@@ -86,17 +86,17 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] Destroying a block spawns 8 particles in that block's color at the block's center, in addition to the existing 4-frame sprite explosion.
-- [ ] Each particle moves outward, is pulled down by gravity, fades linearly, and disappears after about 500 ms.
-- [ ] The sprite explosion still plays 4 frames over 150 ms, unchanged.
-- [ ] The first hit on a gray block shows a white flash of about 80 ms and spawns 3 gray particles; the block is not destroyed and no explosion plays.
-- [ ] The second hit on a gray block destroys it with the sprite explosion and 8 gray particles.
-- [ ] `state.particles.length` never exceeds 200, including when many blocks are destroyed in quick succession.
-- [ ] Ball trajectory, block `hp` and collision results are identical to SPEC 01 (particles and flash never affect collisions).
-- [ ] Destroying the last block lets its particles finish animating while "You win" is shown.
-- [ ] Restarting with Space or Enter leaves `state.particles` empty and no block flashing.
-- [ ] Particles are drawn above the blocks and below the paddle and ball.
-- [ ] No console errors during a full game, and frame rate stays smooth when several blocks break within a second.
+- [x] Destroying a block spawns 8 particles in that block's color at the block's center, in addition to the existing 4-frame sprite explosion.
+- [x] Each particle moves outward, is pulled down by gravity, fades linearly, and disappears after about 500 ms.
+- [x] The sprite explosion still plays 4 frames over 150 ms, unchanged.
+- [x] The first hit on a gray block shows a white flash of about 80 ms and spawns 3 gray particles; the block is not destroyed and no explosion plays.
+- [x] The second hit on a gray block destroys it with the sprite explosion and 8 gray particles.
+- [x] `state.particles.length` never exceeds 200, including when many blocks are destroyed in quick succession.
+- [x] Ball trajectory, block `hp` and collision results are identical to SPEC 01 (particles and flash never affect collisions).
+- [x] Destroying the last block lets its particles finish animating while "You win" is shown.
+- [x] Restarting with Space or Enter leaves `state.particles` empty and no block flashing.
+- [x] Particles are drawn above the blocks and below the paddle and ball.
+- [x] No console errors during a full game, and frame rate stays smooth when several blocks break within a second.
 
 ## Decisions
 

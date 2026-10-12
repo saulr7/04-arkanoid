@@ -267,8 +267,11 @@ function collideBlocks() {
       color: hit.color,
       startedAt: performance.now(),
     });
+    spawnParticles(hit, PARTICLES_PER_BLOCK);
     playSound(sounds.break);
   } else {
+    hit.hitAt = performance.now();
+    spawnParticles(hit, PARTICLES_PER_GRAY_HIT);
     playSound(sounds.bounce);
   }
 }
@@ -347,11 +350,20 @@ function update(dt) {
 function render() {
   ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
+  const now = performance.now();
+
   for (const b of state.blocks) {
     if (b.alive) drawSprite(ctx, "block_" + b.color, b.x, b.y, b.w, b.h);
   }
 
-  const now = performance.now();
+  for (const b of state.blocks) {
+    if (!b.alive || b.hitAt === undefined || now - b.hitAt >= FLASH_DURATION) continue;
+    ctx.globalAlpha = 1 - (now - b.hitAt) / FLASH_DURATION;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(b.x, b.y, b.w, b.h);
+  }
+  ctx.globalAlpha = 1;
+
   state.explosions = state.explosions.filter((ex) => now - ex.startedAt < EXPLOSION_DURATION);
   for (const ex of state.explosions) {
     const frameCount = EXPLOSION_FRAMES[ex.color].length;

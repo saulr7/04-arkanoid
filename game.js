@@ -298,10 +298,10 @@ function render() {
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
   drawSprite(ctx, "ball", ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
 
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "left";
-  ctx.font = "20px sans-serif";
-  ctx.fillText(`Lives: ${state.lives}`, 16, 30);
+  const lifeSize = ball.r * 2;
+  for (let i = 0; i < state.lives; i++) {
+    drawSprite(ctx, "ball", 16 + i * (lifeSize + 8), 16, lifeSize, lifeSize);
+  }
 
   if (state.phase === "won") drawOverlay("You win", "Press Space or Enter to restart");
   else if (state.phase === "lost") drawOverlay("Game over", "Press Space or Enter to restart");

@@ -80,9 +80,9 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] Opening `index.html` (directly or via a static server) shows the 800x600 canvas with 70 blocks and no console errors.
-- [ ] The grid has 7 rows of 10 blocks, with row colors gray, red, yellow, cyan, magenta, hotpink, green from top to bottom.
-- [ ] Before launch, the ball sits centered on top of the paddle and follows it.
+- [x] Opening `index.html` (directly or via a static server) shows the 800x600 canvas with 70 blocks and no console errors.
+- [x] The grid has 7 rows of 10 blocks, with row colors gray, red, yellow, cyan, magenta, hotpink, green from top to bottom.
+- [x] Before launch, the ball sits centered on top of the paddle and follows it.
 - [ ] Left/Right arrows and A/D move the paddle, and the mouse X position also moves it; the paddle never leaves the canvas.
 - [ ] Space or a mouse click launches the ball upward in `ready` phase and does nothing in `playing`.
 - [ ] The ball bounces off the left, right and top walls.
